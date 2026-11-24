@@ -373,7 +373,7 @@ func TestExtractRejectsLinkLocalAddressByDefault(t *testing.T) {
 	opts.Extract = extractpkg.DefaultConfig()
 	s := NewServerWithOptions("127.0.0.1", 0, opts)
 
-	req, err := http.NewRequest(http.MethodPost, "/extract", strings.NewReader(`{"url":"http://169.254.169.254/latest/meta-data/"}`))
+	req, err := newAppTestRequest(http.MethodPost, "/extract", strings.NewReader(`{"url":"http://169.254.169.254/latest/meta-data/"}`))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -395,7 +395,7 @@ func TestExtractRejectsLocalhostByDefault(t *testing.T) {
 	opts.Extract = extractpkg.DefaultConfig()
 	s := NewServerWithOptions("127.0.0.1", 0, opts)
 
-	req, err := http.NewRequest(http.MethodGet, "/extract?url=http://localhost/private", nil)
+	req, err := newAppTestRequest(http.MethodGet, "/extract?url=http://localhost/private", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -475,7 +475,7 @@ func batchExtractTestServer(allowPrivate bool) *Server {
 
 func postBatchExtract(t *testing.T, s *Server, body string, header ...[2]string) *http.Response {
 	t.Helper()
-	req, err := http.NewRequest(http.MethodPost, "/extract/batch", strings.NewReader(body))
+	req, err := newAppTestRequest(http.MethodPost, "/extract/batch", strings.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}

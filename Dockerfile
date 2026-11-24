@@ -1,5 +1,5 @@
 # Build
-FROM --platform=$BUILDPLATFORM golang:1.24.6-bookworm@sha256:ab1d1823abb55a9504d2e3e003b75b36dbeb1cbcc4c92593d85a84ee46becc6c AS builder
+FROM --platform=$BUILDPLATFORM golang:1.26.11-bookworm AS builder
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ ARG TARGETARCH
 RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -trimpath -ldflags="-s -w" -o /app/openserp .
 
 # `chromedp/headless-shell:stable` also works here
-FROM chromedp/headless-shell:stable@sha256:f7e7ac721b023cb8717f8108aef8b3e49995fb1e5a912f41e570c29e45d24961
+FROM chromedp/headless-shell:stable@sha256:381353d3530ab9d579d2fe8b9c0f4519c995617f5a71daf6bb649e2d12005bd9
 
 WORKDIR /usr/src/app
 
@@ -20,6 +20,7 @@ WORKDIR /usr/src/app
 # mupdf-tools: mutool reads the text layer of PDF URLs for /extract.
 # tini: reaps orphaned Chrome children, which would otherwise pile up as zombies when openserp is PID 1.
 RUN apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y --no-install-recommends wget mupdf-tools tini \
   && rm -rf /var/lib/apt/lists/* \
   && getent passwd chrome >/dev/null 2>&1 || useradd --create-home --uid 1001 --shell /bin/bash chrome \
